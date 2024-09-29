@@ -1,0 +1,213 @@
+create database vrinda_data;
+select * from `store data`;
+
+truncate `store data`;
+select * from `store data`;
+
+SET global local_infile=1;
+LOAD DATA local INFILE 'C:\\ProgramData\\MySQL\\Cofee_sales1.csv'
+INTO TABLE `store data`
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+select distinct (`month`) from `store data`;
+
+select count(distinct`ship-city`) from `store data`; # count returns the number of rows
+
+#how many order was comple
+
+select count(*)from `store data`where channel ='Aamzon'or Channel='Myntra' ; #where provide the coundition
+select count(*)from `store data`where channel in ('Amazon','myntra')and Amount >=2000;
+#count of all the orders from myntra ad amazon where amount is greater than 2000
+
+
+#which order has maximum values
+select max(Amount) from `store data`;
+select*from`store data`where Amount=(select max(Amount) from `store data`); #interview quetion 
+#order by statement
+#find out top 10 orders from myntra
+
+#find out top 3 orders from Nalli
+select `Order ID`, Channel, Amount, Category from `store data`where Channel='Nalli' order by amount desc limit 3;
+# limit statement
+
+#between Statement
+
+#how many orderhas has been done by pe
+ # find the avg order value for all customer having age between 40 and 50
+ select round(avg(amount),1) from `store data` where Age between 40 and 50;
+ #like case insensitive 
+ #ilike case sensitive
+ select  count(distinct(`ship-city`)) from `store data`where `ship-city` like '%H' ;
+ 
+ 
+ 
+ #dist
+ select channel, sum(amount)
+ from `store data`
+ group by Channel
+ order by sum(Amount) desc;
+ 
+ # what is monthly revenue
+ select month ,avg(amount),avg(amount) 
+ from `store data`
+ group by month 
+ order by  sum(Amount),avg(amount) desc;
+ 
+ 
+# which channel has generated maximum revenue in jan month
+
+select Channel,sum(amount) as total_revenue
+from `store data`
+where month='jan'
+group by Channel
+order by sum(Amount)desc;
+
+# what is avg order value for each category in each channel
+select  Category ,channel ,avg(amount)
+ from `store data`
+ group by category ,Channel 
+ order by avg(Amount) desc;
+ 
+ # what is avg age and total order of each age group
+ select count(`order id`),`age group`,avg(age)
+ from  `store data`
+group by  `age group`,age;
+
+# having runn after group by
+select `Month` ,sum(amount)
+from `store data`
+group by `Month` having sum(Amount)>180000;
+
+
+# which channel
+select category,channel ,sum(amount) from `store data`
+where Category='set'
+group by Category,channel having sum(amount)>'30000' 
+order by sum(amount)desc ;
+
+
+select `Cust ID`,count(`Order ID`)
+ from `store data`
+ group by `Cust ID` 
+ order by count(`Order ID`)
+ desc
+ limit 3;
+ 
+ describe `store data`;#  describe is a show the data type
+ # how to convert one datatype  to another data type with alter table than table name than modify and column name and than new data type date 
+
+ alter table `store data`
+ modify `date` date;
+ 
+# why the error is incorrect data value 
+# default formate in mysql YYYY-MM-DD 
+# update table name set column name=function is str_to_date(first argument is  column name,`%d-%m-%Y`)this function using convert YYYY-MM-DD
+
+set sql_safe_updates=0; # set is safe update
+# default date format in mysql is YYYY-MM-DD
+
+update `store data`
+set `date`=str_to_date(`date`,'%d-%m-%Y');
+
+ select* from `store data`;
+
+
+ # this use for undo the all  data
+ rollback;
+ start transaction;
+ #commit using  all data save 
+ 
+ 
+select * from `store data`;
+
+start transaction;
+
+alter table `store data`
+add column order_type varchar(78);
+start transaction;
+SET sql_safe_updates=0;
+UPDATE `store data`
+#the CASE statement checks that if the amount is greater than and equals 12000, 
+#it returns expencive and the amount is less than 1000 it returns otherwise moves
+# to the ELSE part and returns average in order_type thecolumn.
+SET order_type=CASE WHEN Amount >=12000 THEN 'expencive'
+					WHEN Amount <1000 THEN 'cheap'
+                    ELSE 'average'
+                    END ;
+			
+select * from `store data`;
+start transaction;
+select order_type, count(order_type) from `store data`
+group by order_type
+order by count(order_type);
+#Windos function row() dense() rank()
+# RANK EACH channel revenue 
+select agegroup,Channel,sum(amount)as total_revenue from  `store data`
+group by Channel
+order by  sum(Amount)desc ;
+
+create table demo(
+name char(55),
+marks int );
+insert into demo values
+('rohit',45),
+('sachin',18),
+('pndaya',45),
+('hardik',34),
+('ronaldo',7),
+('dohni',7);
+
+select *, rank()over(order by marks desc) as `rank`,
+dense_rank() over(order by marks desc) as `dense rank`,
+row_number() over(order by marks desc )as `row rank`
+from demo;
+
+
+select * from `store data`;
+select `age group`,Channel,sum(amount)as total_revenue, 
+rank() over(partition by `age group`
+order by  sum(Amount)desc) 
+from  `store data`
+group by `age group`,Channel
+order by `age group`, sum(Amount)desc ;
+
+# find all the channels where total_revnue is greater
+select Channel,sum(amount) from `store data`
+where `Channel`>50000
+group by Channel;
+
+select channel ,Total_rev from
+(select channel ,sum(amount) as Total_rev from `store data`
+group by Channel)as inner_table
+where `Total_rev`>1000000 ;
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
